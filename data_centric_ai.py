@@ -15,15 +15,18 @@ def get_model():
     model, preprocess = clip.load("ViT-B/32", device=device)
     return model, preprocess
 
-@st.cache 
+@st.cache(suppress_st_warning=True)
 def knn(path): 
+    st.write("Loading data")
     df = pd.read_csv(path)
-    
     a = df['vector'].to_numpy()
+
+    st.write("eval vector")
     all_vecs = [eval(vec) for vec in a[:]]
-    
     all_vecs = np.array(all_vecs)
-    nbrs = NearestNeighbors(n_neighbors=26, algorithm='brute', metric='cosine').fit(all_vecs)
+
+    st.write("fitting knn")
+    nbrs = NearestNeighbors(n_neighbors=26, algorithm='auto', metric='cosine').fit(all_vecs)
 
     return df, all_vecs, nbrs
     
@@ -75,7 +78,7 @@ distances, indices = distances[0], indices[0]
 idx = 0 
 while idx < len(indices):
     try: 
-        cols = st.beta_columns(2) 
+        cols = st.columns(2) 
 
         path = df.iloc[indices[idx]].path
         image = Image.open(path)
